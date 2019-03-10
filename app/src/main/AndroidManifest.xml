@@ -22,12 +22,12 @@
         <activity android:name=".addedittask.AddEditTaskActivity" />
         <activity
                 android:name=".statistics.StatisticsActivity"
-                android:parentActivityName=".tasks.TasksActivity"
+                android:parentActivityName=".tasklist.TaskListActivity"
                 tools:ignore="UnusedAttribute">
             <!-- Parent activity meta-data to support 4.0 and lower -->
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".tasks.TasksActivity" />
+                    android:value=".tasklist.TaskListActivity" />
         </activity>
     </application>
 

@@ -1,13 +1,14 @@
 package com.ryunen344.todo.taskdetail
 
-import android.support.annotation.NonNull
+import com.ryunen344.todo.data.Task
+import com.ryunen344.todo.data.source.TaskListDataSource
+import com.ryunen344.todo.data.source.TaskListRepository
 
 
-
-class TaskDetailPresenter(taskId : String?,tasksRepository : TasksRepository,taskDetailView : TaskDetailContract.View) : TaskDetailContract.Presenter{
+class TaskDetailPresenter(taskId : String?, taskListRepository : TaskListRepository, taskDetailView : TaskDetailContract.View) : TaskDetailContract.Presenter{
 
     private val mTaskDetailView : TaskDetailContract.View = taskDetailView
-    private val mTasksRepository : TasksRepository = tasksRepository
+    private val mTaskListRepository : TaskListRepository = taskListRepository
     private var mTaskId : String? = taskId
 
     init {
@@ -25,10 +26,26 @@ class TaskDetailPresenter(taskId : String?,tasksRepository : TasksRepository,tas
         }
 
         mTaskDetailView.setLoadingIndicator(true)
-        mTasksRepository.getTask(mTaskId,TasksDataSource().GetTaskCallback(){
-            override fun onTaskLoaded(task : Task){
-                //TODO:jissou
+        mTaskListRepository.getTask(mTaskId!!, object : TaskListDataSource.GetTaskCallback{
+            override fun onTaskLoaded(task : Task) {
+                if(!mTaskDetailView.isActive()){
+                    return
+                }
+                mTaskDetailView.setLoadingIndicator(false)
+                if(null == task){
+                    mTaskDetailView.showMissingTask()
+                }else{
+                    showTask(task)
+                }
             }
+
+            override fun onDataNotAvailable() {
+                if(!mTaskDetailView.isActive()){
+                    return
+                }
+                mTaskDetailView.showMissingTask()
+            }
+
         })
     }
 
@@ -45,7 +62,7 @@ class TaskDetailPresenter(taskId : String?,tasksRepository : TasksRepository,tas
             mTaskDetailView.showMissingTask()
             return
         }
-        mTasksRepository.deleteTask(mTaskId)
+        mTaskListRepository.deleteTask(mTaskId!!)
         mTaskDetailView.showTaskDeleted()
     }
 
@@ -54,7 +71,7 @@ class TaskDetailPresenter(taskId : String?,tasksRepository : TasksRepository,tas
             mTaskDetailView.showMissingTask()
             return
         }
-        mTasksRepository.completeTask(mTaskId)
+        mTaskListRepository.completeTask(mTaskId!!)
         mTaskDetailView.showTaskMarkedComplete()
     }
 
@@ -63,13 +80,13 @@ class TaskDetailPresenter(taskId : String?,tasksRepository : TasksRepository,tas
             mTaskDetailView.showMissingTask()
             return
         }
-        mTasksRepository.activateTask(mTaskId)
+        mTaskListRepository.activateTask(mTaskId!!)
         mTaskDetailView.showTaskMarkedActive()
     }
 
     fun showTask(task : Task){
-        val title : String = task.getTitle()
-        val description : String = task.getDescription()
+        val title : String = task.title!!
+        val description : String = task.description!!
 
         if(title.isNullOrBlank()){
             mTaskDetailView.hideTitle()

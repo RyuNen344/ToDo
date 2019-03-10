@@ -12,6 +12,12 @@ import java.util.UUID
 
 @Entity(tableName = "tasks")
 data class Task(var title : String?, var description : String?, var id : String, var completed : Boolean){
+    constructor(title : String?, description : String?, id : String) : this(title,description,id,false)
+
+    constructor(title : String? ,description : String?) : this(title,description, UUID.randomUUID().toString(),false)
+
+    constructor(title : String?,description : String?,completed : Boolean) :this(title,description,UUID.randomUUID().toString(),completed)
+
     @PrimaryKey
     @ColumnInfo(name = "entryid")
     private var mId : String = id
@@ -24,21 +30,6 @@ data class Task(var title : String?, var description : String?, var id : String,
 
     @ColumnInfo(name = "completed")
     private var mCompleted : Boolean = completed
-
-    @Ignore
-    fun Task(title : String?, description : String?){
-        Task(title, description, UUID.randomUUID().toString(), false)
-    }
-
-    @Ignore
-    fun Task(title : String?, description : String?, id : String){
-        Task(title, description, id, false)
-    }
-
-    @Ignore
-    fun Task(title : String?,description : String?,completed : Boolean){
-        Task(title,description,UUID.randomUUID().toString(),completed)
-    }
 
     fun getTitleForList() : String{
         if(!mTitle.isNullOrEmpty()){
